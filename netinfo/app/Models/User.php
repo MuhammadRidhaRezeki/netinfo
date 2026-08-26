@@ -42,6 +42,16 @@ class User extends Authenticatable
         return $this->role === 'customer';
     }
 
+    public function roleLabel(): string
+    {
+        return match ($this->role) {
+            'admin' => 'Admin',
+            'technician' => 'Teknisi',
+            'customer' => 'User',
+            default => $this->role,
+        };
+    }
+
     public function customer(): HasOne
     {
         return $this->hasOne(Customer::class);

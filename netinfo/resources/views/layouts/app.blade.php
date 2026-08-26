@@ -117,7 +117,7 @@
                 <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-xs font-bold text-white">{{ $authUser->initials() }}</span>
                 <div class="min-w-0">
                     <p class="truncate text-sm font-semibold text-white">{{ $authUser->name }}</p>
-                    <p class="truncate text-xs capitalize text-slate-400">{{ $authUser->role }}</p>
+                    <p class="truncate text-xs text-slate-400">{{ $authUser->roleLabel() }}</p>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -179,7 +179,7 @@
                             <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-xs font-bold text-white">{{ $authUser->initials() }}</span>
                             <span class="hidden text-left sm:block">
                                 <span class="block text-sm font-semibold leading-tight text-slate-800">{{ $authUser->name }}</span>
-                                <span class="block text-[11px] leading-tight capitalize text-slate-500">{{ $authUser->role }}</span>
+                                <span class="block text-[11px] leading-tight text-slate-500">{{ $authUser->roleLabel() }}</span>
                             </span>
                             <svg class="hidden h-4 w-4 text-slate-400 sm:block" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
                         </button>

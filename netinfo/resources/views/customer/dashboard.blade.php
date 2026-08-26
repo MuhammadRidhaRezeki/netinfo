@@ -146,7 +146,7 @@
     <div class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
             <h3 class="text-base font-bold text-slate-900">Tiket Gangguan Terbaru</h3>
-            <a href="{{ route('customer.helpcare') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-500">Buka Helpcare &rarr;</a>
+            <a href="{{ route('customer.helpcare') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-500">Helpcare &rarr;</a>
         </div>
         <ul class="divide-y divide-slate-100">
             @forelse ($customer->tickets()->with('technician')->latest()->take(3)->get() as $t)

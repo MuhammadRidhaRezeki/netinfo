@@ -64,7 +64,12 @@
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="font-mono text-xs font-bold text-indigo-600">{{ $featured->ticket_code }}</span>
                                 <span class="inline-flex rounded-md px-2 py-0.5 text-[11px] font-bold uppercase ring-1 ring-inset {{ $featured->priority === 'high' ? 'bg-red-50 text-red-700 ring-red-600/20' : ($featured->priority === 'medium' ? 'bg-amber-50 text-amber-700 ring-amber-600/20' : 'bg-slate-100 text-slate-600 ring-slate-500/20') }}">{{ $featured->priority }}</span>
-                                <span class="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset {{ $statPill[$featured->status] }}">{{ in_array($featured->status, ['open', 'in_progress']) ? '<span class="animate-pulse h-1.5 w-1.5 rounded-full bg-current"></span>' : '' }}{{ $statLabel[$featured->status] }}</span>
+                                <span class="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset {{ $statPill[$featured->status] }}">
+                                    @if (in_array($featured->status, ['open', 'in_progress']))
+                                        <span class="animate-pulse h-1.5 w-1.5 rounded-full bg-current"></span>
+                                    @endif
+                                    {{ $statLabel[$featured->status] }}
+                                </span>
                             </div>
                             <h3 class="mt-1.5 text-lg font-extrabold tracking-tight text-slate-900">{{ $featured->issue_title }}</h3>
                             <p class="mt-0.5 max-w-xl text-sm text-slate-500">{{ $featured->description }}</p>
@@ -93,7 +98,7 @@
                                         </p>
                                         <p class="text-xs font-medium text-slate-400">{{ $h->created_at->translatedFormat('d M Y, H:i') }} WIB</p>
                                     </div>
-                                    @if ($h->note)<p class="mt-1 text-sm text-slate-500">{{ $h->note }} <span class="text-slate-400">— {{ $h->user?->name }} ({{ ucfirst($h->user?->role ?? '') }})</span></p>@endif
+                                    @if ($h->note)<p class="mt-1 text-sm text-slate-500">{{ $h->note }} <span class="text-slate-400">— {{ $h->user?->name }} ({{ $h->user?->roleLabel() ?? '' }})</span></p>@endif
                                 </li>
                             @empty
                                 <li class="text-sm italic text-slate-400">Belum ada riwayat.</li>

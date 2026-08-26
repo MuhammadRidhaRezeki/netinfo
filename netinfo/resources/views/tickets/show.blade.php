@@ -62,7 +62,7 @@
                                 @elseif ($progressStep)
                                     <span class="inline-flex rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-700">In Progress / Dikerjakan</span>
                                 @endif
-                                <p class="text-xs text-slate-400">{{ $h->created_at->translatedFormat('d M Y, H:i') }} · oleh {{ $h->user?->name }} ({{ ucfirst($h->user?->role ?? '-') }})</p>
+                                <p class="text-xs text-slate-400">{{ $h->created_at->translatedFormat('d M Y, H:i') }} · oleh {{ $h->user?->name }} ({{ $h->user?->roleLabel() ?? '-' }})</p>
                             </div>
                             @if ($h->note)<p class="mt-1 text-sm leading-relaxed text-slate-600">{{ $h->note }}</p>@endif
                         </li>
