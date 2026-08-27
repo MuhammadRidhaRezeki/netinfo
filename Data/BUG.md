@@ -106,16 +106,14 @@ nya tidak bisa isi huruf dan minimal pengisian angka 10 dan maksimal 15
 
 
 
-# di halaman login
 saat input password harusnya ada fitur input passwrod bisa  milhat password yg di inputkan
-
-
-di dashboard saat pilih paket, ngulang lgi saat isi data
 
 
 di halaamn login clietn, untuk buka help care tidak usah ada buka 
 
 di role client saat login jangan tulis costumer tulis user
 
-di bagian helpcare di tiket nya masi muncul ini
+di bagian helpcare di tiket nya masi muncul ini 
 <span class="animate-pulse h-1.5 w-1.5 rounded-full bg-current"></span>Open
+
+### ALL BUG FIXED

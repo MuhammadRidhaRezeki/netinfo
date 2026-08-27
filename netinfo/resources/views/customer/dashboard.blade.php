@@ -18,7 +18,7 @@
     @endphp
 
     @if ($nearestDue)
-        <div class="overflow-hidden rounded-xl border border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 p-5 shadow-sm">
+        <div class="overflow-hidden rounded-xl border border-amber-200 bg-amber-50/60 p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 ring-4 ring-amber-200/50">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
@@ -27,7 +27,7 @@
                     <p class="text-sm font-bold text-amber-900">Anda memiliki {{ $unpaidCount }} tagihan belum lunas — total Rp {{ number_format($unpaidSum, 0, ',', '.') }}</p>
                     <p class="mt-0.5 text-sm text-amber-700">Invoice <span class="font-mono font-semibold">{{ $nearestDue->invoice_code }}</span> ({{ \Carbon\Carbon::createFromFormat('Y-m', $nearestDue->billing_month)->translatedFormat('F Y') }}) jatuh tempo {{ $nearestDue->due_date->translatedFormat('d F Y') }}.</p>
                 </div>
-                <button type="button" onclick="openPaymentModal('{{ $nearestDue->id }}')" class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-amber-500/30 transition hover:bg-amber-400">
+                <button type="button" onclick="openPaymentModal('{{ $nearestDue->id }}')" class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-amber-500 active:scale-[0.99]">
                     Bayar Sekarang
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
                 </button>
@@ -56,10 +56,10 @@
                 <span class="flex h-10 w-10 items-center justify-center rounded-lg {{ $customer->status === 'active' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600' }}">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </span>
-                @if ($customer->status === 'active' && $nodeStatus !== 'down')
-                    <span class="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/20"><span class="animate-pulse h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Terhubung</span>
+@if ($customer->status === 'active' && $nodeStatus !== 'down')
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700"><span class="animate-pulse h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Terhubung</span>
                 @else
-                    <span class="inline-flex items-center gap-1.5 rounded-md bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 ring-1 ring-inset ring-red-600/20"><span class="animate-pulse h-1.5 w-1.5 rounded-full bg-red-500"></span> Terputus</span>
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700"><span class="animate-pulse h-1.5 w-1.5 rounded-full bg-rose-500"></span> Terputus</span>
                 @endif
             </div>
             @if ($customer->status === 'isolated')

@@ -3,7 +3,7 @@
 **Nama Produk:** NetInfo (Network Information & Operation Management System)  
 **Database Engine:** MySQL 8.0+ / MariaDB 10.4+ (Storage Engine: **InnoDB**)  
 **Karakter Enkoding & Collation:** `utf8mb4` / `utf8mb4_unicode_ci`  
-**Versi Dokumen:** 1.0 (Final Database Blueprint)  
+**Versi Dokumen:** 1.1 (Updated Database Blueprint)  
 
 ---
 

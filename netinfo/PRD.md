@@ -2,7 +2,7 @@
 
 **Nama Produk:** NetInfo (Network Information & Operation Management System)  
 **Judul Proyek:** Rancang Bangun Sistem Informasi Manajemen Operasional Jaringan, Layanan Gangguan (*Trouble Ticketing*), dan *Billing* Pelanggan Berbasis Web Menggunakan Framework Laravel  
-**Versi Dokumen:** 2.0 (Updated & Refined)  
+**Versi Dokumen:** 1.1
 **Target Platform:** Web Desktop & Mobile-Responsive  
 
 ---
@@ -37,7 +37,7 @@ Pengelolaan operasional pada penyedia layanan internet skala lokal (ISP/RT-RW Ne
 
 ### Modul B: Manajemen Data Master & Infrastruktur Jaringan
 * **`FR-MST-01`**: Administrator dapat mengelola (CRUD) data paket internet (nama paket, kecepatan, tarif bulanan, deskripsi).
-* **`FR-MST-02`**: Administrator dan Teknisi dapat mengelola (CRUD) titik *Network Node* / ODP (kode node unik, nama titik, lokasi wilayah, alamat IP manajemen, kapasitas port, port terpakai, dan status operasional: *active/maintenance/down*).
+* **`FR-MST-02`**: Administrator dapat mengelola penuh (CRUD) titik *Network Node* / ODP; Teknisi dapat menambah dan memperbarui data ODP. Data meliputi nama/kode node unik, lokasi wilayah, alamat IP manajemen, dan status operasional: *active/maintenance/down*.
 * **`FR-MST-03`**: Administrator dapat mengelola (CRUD) data pelanggan (kode pelanggan otomatis `CUST-YYYYMM-XXXX`, penetapan paket, penentuan ODP terhubung, alamat, kontak, dan status: *active/isolated/inactive*). Penambahan pelanggan baru otomatis membuatkan akun login di tabel `users`.
 * **`FR-MST-04`**: Administrator dapat melakukan isolir layanan pelanggan (`active` $\rightarrow$ `isolated`) dan melakukan pemulihan kembali (`isolated` $\rightarrow$ `active`).
 
@@ -53,9 +53,10 @@ Pengelolaan operasional pada penyedia layanan internet skala lokal (ISP/RT-RW Ne
 * **`FR-BIL-02`**: Pelanggan dapat membuka modal pembayaran interaktif dengan 2 opsi metode:
   * **Transfer Bank:** Menampilkan nomor rekening SeaBank (`9981237810913` a.n. Muhammad Ridha Rezeki) dengan fitur salin nomor rekening.
   * **QRIS Dinamis:** Menampilkan gambar kode QRIS dari aset sistem (`public/images/qris.jpg`).
-* **`FR-BIL-03`**: Pelanggan dapat mengunggah berkas bukti pembayaran (`.jpg`, `.jpeg`, `.png`, `.pdf`) yang mengubah status invoice menjadi `pending_verification`.
-* **`FR-BIL-04`**: Administrator memvalidasi bukti pembayaran terlampir; jika disetujui (*Approve*), status tagihan berubah menjadi `paid` dan tanggal pembayaran tercatat. Jika ditolak (*Reject*), status kembali ke `unpaid`.
+* **`FR-BIL-03`**: Pelanggan dapat mengunggah berkas bukti pembayaran (`.jpg`, `.jpeg`, `.png`, `.pdf`) bersama pilihan metode pembayaran (`SeaBank Transfer` atau `QRIS`) yang disimpan ke kolom `payment_method`.
+* **`FR-BIL-04`**: Administrator memvalidasi bukti pembayaran terlampir; jika disetujui (*Approve*), status tagihan berubah menjadi `paid` dan tanggal pembayaran tercatat. Jika ditolak (*Reject*), kolom `payment_proof` dan `payment_method` dikosongkan agar pelanggan dapat mengunggah ulang.
 * **`FR-BIL-05`**: Sistem menyediakan fitur cetak faktur/struk resmi individual (`GET /invoices/{id}/print`) format A4 siap cetak (`@media print`) yang memuat rincian invoice, identitas pelanggan, detail ODP, nominal paket, dan stempel status **LUNAS / PAID**.
+* **`FR-BIL-06`**: Sistem menyediakan fitur ekspor rekapitulasi billing ke format CSV (`GET /admin/invoices/export`) dengan filter periode bulan dan status pembayaran.
 
 ---
 
@@ -78,46 +79,82 @@ Pengelolaan operasional pada penyedia layanan internet skala lokal (ISP/RT-RW Ne
 
 ## 5. Arsitektur Basis Data (Entity Relationship)
 
-┌──────────────────┐           ┌───────────────────────────┐           ┌───────────────────┐
-│ internet_packages│1         │         customers         │         1│   network_nodes   │
-├──────────────────┤───────────├───────────────────────────┤───────────├───────────────────┤
-│ id (PK)          │           │ id (PK)                   │           │ id (PK)           │
-│ name             │           │ user_id (FK, Unique)      │           │ node_code (Unique)│
-│ speed            │           │ package_id (FK)           │           │ name              │
-│ price            │           │ node_id (FK)              │           │ location          │
-│ description      │           │ customer_code (Unique)    │           │ ip_address        │
-└──────────────────┘           │ address                   │           │ capacity          │
-│ status                    │           │ used_ports        │
-└─────────────┬─────────────┘           │ status            │
-│1                        └───────────────────┘
-│
-┌───────────────────────────────┴───────────────────────────────┐
-│*                                                              │*
-┌────────────┴──────────────┐                                   ┌────────────┴──────────────┐
-│         invoices          │                                   │          tickets          │
-├───────────────────────────┤                                   ├───────────────────────────┤
-│ id (PK)                   │                                   │ id (PK)                   │
-│ customer_id (FK)          │                                   │ customer_id (FK)          │
-│ invoice_code (Unique)     │                                   │ technician_id (FK, Null)  │
-│ amount                    │                                   │ ticket_code (Unique)      │
-│ billing_period            │                                   │ title                     │
-│ due_date                  │                                   │ description               │
-│ status                    │                                   │ priority                  │
-│ payment_method            │                                   │ status                    │
-│ proof_of_payment          │                                   │ resolved_at               │
-│ paid_at                   │                                   └────────────┬──────────────┘
-└───────────────────────────┘                                                │1
-│*
-┌────────────┴──────────────┐
-│     ticket_histories      │
-├───────────────────────────┤
-│ id (PK)                   │
-│ ticket_id (FK)            │
-│ user_id (FK)              │
-│ status_from               │
-│ status_to                 │
-│ notes                     │
-└───────────────────────────┘
+```mermaid
+erDiagram
+    users ||--o| customers : "1:1"
+    users ||--o{ tickets : "technician"
+    users ||--o{ ticket_histories : "actor"
+    packages ||--o{ customers : "1:N"
+    network_nodes ||--o{ customers : "1:N"
+    customers ||--o{ tickets : "1:N"
+    customers ||--o{ invoices : "1:N"
+    tickets ||--o{ ticket_histories : "1:N"
+
+    users {
+        bigint id PK
+        string name
+        string email UK
+        string password
+        enum role "admin,technician,customer"
+    }
+    packages {
+        bigint id PK
+        string name
+        int speed_mbps
+        decimal price
+        text description
+        boolean is_active
+    }
+    network_nodes {
+        bigint id PK
+        string name UK
+        string location_area
+        string ip_address
+        enum status "active,maintenance,down"
+    }
+    customers {
+        bigint id PK
+        bigint user_id FK,UK
+        bigint package_id FK
+        bigint node_id FK
+        string customer_code UK
+        text address
+        string phone
+        date installation_date
+        enum status "active,isolated,inactive"
+        bigint isolated_by_node_id
+    }
+    tickets {
+        bigint id PK
+        bigint customer_id FK
+        bigint technician_id FK
+        string ticket_code UK
+        string issue_title
+        text description
+        enum priority "low,medium,high"
+        enum status "open,in_progress,resolved,closed"
+        timestamp resolved_at
+    }
+    ticket_histories {
+        bigint id PK
+        bigint ticket_id FK
+        bigint user_id FK
+        string action_type
+        text note
+    }
+    invoices {
+        bigint id PK
+        bigint customer_id FK
+        string invoice_code UK
+        string billing_month UK
+        decimal amount
+        date due_date
+        enum payment_status "unpaid,paid,cancelled"
+        string payment_method
+        timestamp payment_date
+        string payment_proof
+    }
+```
 
 ---
 
@@ -150,12 +187,15 @@ Pengelolaan operasional pada penyedia layanan internet skala lokal (ISP/RT-RW Ne
 | | `node_id` | BIGINT (FK) | Relasi ke `network_nodes.id` |
 | | `customer_code` | VARCHAR(30) | Unique, format: `CUST-YYYYMM-XXXX` |
 | | `address` | TEXT | Alamat lengkap instalasi |
+| | `phone` | VARCHAR(20) | Nomor WhatsApp/telepon (10-15 digit angka) |
+| | `installation_date` | DATE | Tanggal pemasangan / aktivasi layanan |
 | | `status` | ENUM | `'active'`, `'isolated'`, `'inactive'` |
+| | `isolated_by_node_id` | BIGINT | Nullable, penanda isolasi otomatis oleh ODP |
 | **`tickets`** | `id` | BIGINT (PK) | Auto increment |
 | | `customer_id` | BIGINT (FK) | Relasi ke `customers.id` (Pelapor) |
 | | `technician_id`| BIGINT (FK) | Nullable, relasi ke `users.id` (Teknisi tugas) |
 | | `ticket_code` | VARCHAR(30) | Unique, format: `TICK-YYYYMMDD-XXXX` |
-| | `title` | VARCHAR(255) | Subjek keluhan kendala |
+| | `issue_title` | VARCHAR(255) | Subjek keluhan kendala |
 | | `description` | TEXT | Kronologi / detail kerusakan |
 | | `priority` | ENUM | `'low'`, `'medium'`, `'high'` |
 | | `status` | ENUM | `'open'`, `'in_progress'`, `'resolved'`, `'closed'` |
@@ -163,19 +203,18 @@ Pengelolaan operasional pada penyedia layanan internet skala lokal (ISP/RT-RW Ne
 | **`ticket_histories`** | `id` | BIGINT (PK) | Auto increment |
 | | `ticket_id` | BIGINT (FK) | Relasi ke `tickets.id` (Cascade) |
 | | `user_id` | BIGINT (FK) | Relasi ke `users.id` (Pelaku aksi) |
-| | `status_from` | VARCHAR(50) | Status awal sebelum aksi |
-| | `status_to` | VARCHAR(50) | Status baru setelah aksi |
-| | `notes` | TEXT | Catatan log pengerjaan teknis |
+| | `action_type` | VARCHAR(50) | Tipe aksi: `created`, `assigned`, `status_changed`, `note_added` |
+| | `note` | TEXT | Catatan log pengerjaan teknis |
 | **`invoices`** | `id` | BIGINT (PK) | Auto increment |
 | | `customer_id` | BIGINT (FK) | Relasi ke `customers.id` |
 | | `invoice_code` | VARCHAR(30) | Unique, format: `INV-YYYYMM-XXXX` |
 | | `amount` | DECIMAL(12,2) | Nominal tagihan |
-| | `billing_period`| VARCHAR(50) | Misal: "Agustus 2026" |
-| | `due_date` | DATE | Tanggal jatuh tempo tagihan |
-| | `status` | ENUM | `'unpaid'`, `'pending_verification'`, `'paid'`, `'cancelled'` |
+| | `billing_month`| VARCHAR(7) | Periode tagihan, format `YYYY-MM` (misal: "2026-08") |
+| | `due_date` | DATE | Tanggal jatuh tempo tagihan (tanggal 25) |
+| | `payment_status` | ENUM | `'unpaid'`, `'paid'`, `'cancelled'` |
 | | `payment_method`| VARCHAR(50) | Nullable (`'SeaBank Transfer'`, `'QRIS'`) |
-| | `proof_of_payment`| VARCHAR(255)| Nullable, path berkas bukti transfer |
-| | `paid_at` | TIMESTAMP | Nullable, waktu verifikasi lunas |
+| | `payment_proof`| VARCHAR(255)| Nullable, path berkas bukti transfer |
+| | `payment_date` | TIMESTAMP | Nullable, waktu verifikasi lunas |
 
 ---
 
@@ -225,3 +264,21 @@ Pengelolaan operasional pada penyedia layanan internet skala lokal (ISP/RT-RW Ne
 - [ ] **Bab 3:** Diagram UML (Use Case, Activity, Sequence), Flowchart Tiket & Billing, dan ERD Kamus Data.
 - [ ] **Bab 4:** Implementasi antarmuka dan tabel pengujian fungsional *Black Box Testing*.
 - [ ] **Bab 5:** Penarikan kesimpulan dan saran pengembangan lanjutan.
+
+### Fase 7: Fitur Tambahan & Perbaikan Berdasarkan BUG.md
+- [x] **Modal pembayaran interaktif** di dashboard customer dengan 2 metode: SeaBank Transfer dan QRIS.
+- [x] **Upload bukti pembayaran** oleh customer dengan validasi file dan pilihan metode.
+- [x] **Verifikasi pembayaran** oleh admin (Approve/Reject) dengan reset data jika ditolak.
+- [x] **Fitur isolir & pemulihan** pelanggan oleh admin dengan status perubahan (`active` ↔ `isolated`).
+- [x] **Cascade isolation** saat status ODP berubah menjadi `maintenance` atau `down`.
+- [x] **Cascade restoration** saat ODP kembali `active` hanya untuk pelanggan yang diisolir oleh sistem.
+- [x] **Validasi nomor WA** (hanya angka, 10-15 digit) di semua form pelanggan.
+- [x] **Toggle show/hide password** di halaman login dan profil.
+- [x] **Perbaikan UI** ganti label "Customer" menjadi "User" di client dashboard.
+- [x] **Fix semua fitur search, filter, dan CRUD** di semua modul.
+- [x] **Fix bug parsing syntax** di view tickets/show.blade.php.
+- [x] **Update profil UI** - hapus menu "Pengaturan", cukup "Profil Saya".
+- [x] **Fix fitur ekspor** rekap tiket dan invoice ke CSV.
+- [x] **Improve scroll UX** tabel responsif dengan `overflow-x-auto`.
+- [x] **Fix prioritas color selection** di form helpcare customer.
+- [x] **Fix status update** di riwayat penanganan tiket.

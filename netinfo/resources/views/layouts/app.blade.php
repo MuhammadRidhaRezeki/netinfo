@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Dashboard') · NetInfo</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,7 +15,7 @@
         };
     </script>
 </head>
-<body class="min-h-screen bg-slate-100 font-sans text-slate-800 antialiased">
+<body class="min-h-screen bg-[#fafafa] font-sans text-slate-800 antialiased">
 @php
     $authUser = auth()->user();
     $isAdmin = $authUser->isAdmin();
@@ -32,13 +33,13 @@
         $navBillingBadge = $awaitingVerify;
 
         if ($openUnassigned > 0) {
-            $notifItems[] = ['color' => 'bg-red-500', 'text' => "{$openUnassigned} tiket open belum ditugaskan ke teknisi.", 'time' => 'Butuh tindakan', 'url' => route('admin.tickets.index')];
+            $notifItems[] = ['color' => 'bg-rose-500', 'text' => "{$openUnassigned} tiket open belum ditugaskan ke teknisi.", 'time' => 'Butuh tindakan', 'url' => route('admin.tickets.index')];
         }
         if ($awaitingVerify > 0) {
             $notifItems[] = ['color' => 'bg-amber-500', 'text' => "{$awaitingVerify} bukti pembayaran menunggu verifikasi.", 'time' => 'Butuh tindakan', 'url' => route('admin.billing.index')];
         }
         if ($nodeDown > 0) {
-            $notifItems[] = ['color' => 'bg-red-500', 'text' => "{$nodeDown} network node berstatus Down.", 'time' => 'Pantau jaringan', 'url' => route('admin.network-nodes.index')];
+            $notifItems[] = ['color' => 'bg-rose-500', 'text' => "{$nodeDown} network node berstatus Down.", 'time' => 'Pantau jaringan', 'url' => route('admin.network-nodes.index')];
         }
 
         $nav = [
@@ -53,7 +54,7 @@
         $navTicketBadge = $myOpen;
 
         if ($myOpen > 0) {
-            $notifItems[] = ['color' => 'bg-red-500', 'text' => "Anda memiliki {$myOpen} work order aktif menunggu pengerjaan.", 'time' => 'Agenda Anda', 'url' => route('technician.tickets.index')];
+            $notifItems[] = ['color' => 'bg-rose-500', 'text' => "Anda memiliki {$myOpen} work order aktif menunggu pengerjaan.", 'time' => 'Agenda Anda', 'url' => route('technician.tickets.index')];
         }
 
         $nav = [
@@ -67,7 +68,7 @@
         $unpaidCount = $customer ? $customer->invoices()->where('payment_status', 'unpaid')->count() : 0;
 
         if ($unpaidCount > 0) {
-            $notifItems[] = ['color' => 'bg-red-500', 'text' => "Anda punya {$unpaidCount} tagihan belum lunas.", 'time' => 'Segera bayar', 'url' => route('customer.dashboard')];
+            $notifItems[] = ['color' => 'bg-rose-500', 'text' => "Anda punya {$unpaidCount} tagihan belum lunas.", 'time' => 'Segera bayar', 'url' => route('customer.dashboard')];
         }
         if ($customer && $customer->tickets()->whereIn('status', ['in_progress'])->exists()) {
             $notifItems[] = ['color' => 'bg-emerald-500', 'text' => 'Teknisi sedang menangani laporan Anda.', 'time' => 'Progres', 'url' => route('customer.helpcare')];
@@ -84,44 +85,39 @@
 
     <div id="sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-slate-900/60 backdrop-blur-sm lg:hidden" onclick="toggleSidebar(false)"></div>
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-72 -translate-x-full flex-col bg-slate-900 transition-transform duration-200 ease-in-out lg:translate-x-0">
-        <div class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-800 px-5">
-            <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500 shadow-lg shadow-indigo-500/30">
-                <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 16.038a5.25 5.25 0 017.433 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z"/></svg>
-            </span>
-            <div>
-                <p class="text-base font-bold leading-tight text-white">NetInfo</p>
-                <p class="text-[11px] font-medium text-slate-400">Network Operation System</p>
-            </div>
-            <span class="ml-auto rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-emerald-300">LIVE</span>
-            <button type="button" class="ml-1 rounded-md p-1 text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden" onclick="toggleSidebar(false)">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col border-r border-slate-800/80 bg-slate-950 transition-transform duration-200 ease-in-out lg:translate-x-0">
+        <div class="flex h-16 shrink-0 items-center justify-between border-b border-slate-800/80 px-5">
+            <a href="{{ route('home') }}" class="flex items-center">
+                <x-brand-logo size="md" :withText="true" textColor="white" subtext="Network Operation System" />
+            </a>
+            <button type="button" class="rounded-md p-1 text-slate-500 hover:bg-slate-900 hover:text-white lg:hidden" onclick="toggleSidebar(false)">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
 
         <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-5">
-            <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Menu {{ $isAdmin ? 'Administrator' : ($isTechnician ? 'Teknisi Lapangan' : 'Pelanggan') }}</p>
+            <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-600">Menu {{ $isAdmin ? 'Administrator' : ($isTechnician ? 'Teknisi Lapangan' : 'Pelanggan') }}</p>
             @foreach ($nav as $item)
-                <a href="{{ route($item['route']) }}" class="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors {{ $item['active'] ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/40' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                    <svg class="h-5 w-5 shrink-0 {{ $item['active'] ? 'text-white' : 'text-slate-400 group-hover:text-white' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor">{!! $item['icon'] !!}</svg>
+                <a href="{{ route($item['route']) }}" class="group flex items-center gap-3 rounded-lg border-l-2 px-3 py-2.5 text-sm font-medium transition-colors {{ $item['active'] ? 'border-indigo-500 bg-slate-900 text-white' : 'border-transparent text-slate-400 hover:bg-slate-900/50 hover:text-slate-200' }}">
+                    <svg class="h-5 w-5 shrink-0 {{ $item['active'] ? 'text-white' : 'text-slate-500 group-hover:text-slate-200' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor">{!! $item['icon'] !!}</svg>
                     {{ $item['label'] }}
                     @if (!empty($item['badge']))
-                        <span class="ml-auto inline-flex min-w-[1.5rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold {{ $item['active'] ? 'bg-white/20 text-white' : 'bg-red-500/90 text-white' }}">{{ $item['badge'] }}</span>
+                        <span class="ml-auto inline-flex min-w-[1.5rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold {{ $item['active'] ? 'bg-white/20 text-white' : 'bg-rose-500/90 text-white' }}">{{ $item['badge'] }}</span>
                     @endif
                 </a>
             @endforeach
         </nav>
 
-        <div class="border-t border-slate-800 p-4">
-            <div class="flex items-center gap-3 rounded-xl bg-slate-800/70 p-3">
-                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-xs font-bold text-white">{{ $authUser->initials() }}</span>
+        <div class="border-t border-slate-800/80 p-4">
+            <div class="flex items-center gap-3 rounded-xl bg-slate-900/60 p-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-slate-200 ring-1 ring-slate-700">{{ $authUser->initials() }}</span>
                 <div class="min-w-0">
                     <p class="truncate text-sm font-semibold text-white">{{ $authUser->name }}</p>
-                    <p class="truncate text-xs text-slate-400">{{ $authUser->roleLabel() }}</p>
+                    <p class="truncate text-xs text-slate-500">{{ $authUser->roleLabel() }}</p>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" title="Keluar" class="rounded-md p-1.5 text-slate-400 transition hover:bg-slate-700 hover:text-white">
+                    <button type="submit" title="Keluar" class="rounded-md p-1.5 text-slate-500 transition hover:bg-slate-800 hover:text-white">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
                     </button>
                 </form>
@@ -129,14 +125,14 @@
         </div>
     </aside>
 
-    <div class="flex min-h-screen flex-col lg:pl-72">
-        <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
+    <div class="flex min-h-screen flex-col lg:pl-64">
+        <header class="sticky top-0 z-20 border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
             <div class="flex h-16 items-center gap-3 px-4 sm:px-6 lg:px-8">
                 <button type="button" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 lg:hidden" onclick="toggleSidebar(true)">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
                 </button>
                 <div class="min-w-0">
-                    <h1 class="truncate text-base font-bold text-slate-900 sm:text-lg">@yield('page_title', 'Dashboard')</h1>
+                    <h1 class="truncate text-base font-semibold text-slate-900 sm:text-lg">@yield('page_title', 'Dashboard')</h1>
                     <p class="hidden truncate text-xs text-slate-500 sm:block">@yield('page_subtitle', 'NetInfo — Sistem Manajemen Operasional Jaringan')</p>
                 </div>
 
@@ -144,20 +140,20 @@
                     <form action="{{ route('search') }}" method="GET" class="relative hidden md:block">
                         <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
                         <input type="search" name="q" value="{{ request()->query('q') }}" placeholder="Cari tiket, pelanggan, invoice..." autocomplete="off"
-                            class="w-64 rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100">
+                            class="w-64 rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10">
                     </form>
 
                     <div class="relative">
                         <button type="button" onclick="netinfoToggleDropdown('notif-panel')" class="relative rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
                             @if ($notifCount > 0)
-                                <span class="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-0.5 text-[10px] font-bold text-white ring-2 ring-white">{{ $notifCount }}</span>
+                                <span class="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-0.5 text-[10px] font-bold text-white ring-2 ring-white">{{ $notifCount }}</span>
                             @endif
                         </button>
-                        <div id="notif-panel" data-dropdown-panel class="absolute right-0 mt-2 hidden w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                        <div id="notif-panel" data-dropdown-panel class="absolute right-0 mt-2 hidden w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg ring-1 ring-black/5">
                             <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
                                 <p class="text-sm font-semibold text-slate-900">Notifikasi</p>
-                                @if ($notifCount > 0)<span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600">{{ $notifCount }} baru</span>@endif
+                                @if ($notifCount > 0)<span class="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-600">{{ $notifCount }} baru</span>@endif
                             </div>
                             <ul class="divide-y divide-slate-100">
                                 @forelse ($notifItems as $n)
@@ -176,14 +172,14 @@
 
                     <div class="relative">
                         <button type="button" onclick="netinfoToggleDropdown('user-panel')" class="flex items-center gap-2 rounded-lg p-1.5 transition hover:bg-slate-100">
-                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-xs font-bold text-white">{{ $authUser->initials() }}</span>
+                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white ring-1 ring-slate-700">{{ $authUser->initials() }}</span>
                             <span class="hidden text-left sm:block">
                                 <span class="block text-sm font-semibold leading-tight text-slate-800">{{ $authUser->name }}</span>
                                 <span class="block text-[11px] leading-tight text-slate-500">{{ $authUser->roleLabel() }}</span>
                             </span>
                             <svg class="hidden h-4 w-4 text-slate-400 sm:block" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
                         </button>
-                        <div id="user-panel" data-dropdown-panel class="absolute right-0 mt-2 hidden w-52 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                        <div id="user-panel" data-dropdown-panel class="absolute right-0 mt-2 hidden w-52 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg ring-1 ring-black/5">
                             <div class="border-b border-slate-100 px-4 py-3">
                                 <p class="truncate text-sm font-semibold text-slate-900">{{ $authUser->name }}</p>
                                 <p class="truncate text-xs text-slate-500">{{ $authUser->email }}</p>
@@ -191,7 +187,7 @@
                             <a href="{{ route('profile') }}" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">Profil Saya</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="block w-full border-t border-slate-100 px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50">Keluar</button>
+                                <button type="submit" class="block w-full border-t border-slate-100 px-4 py-2.5 text-left text-sm font-medium text-rose-600 hover:bg-rose-50">Keluar</button>
                             </form>
                         </div>
                     </div>
@@ -201,14 +197,14 @@
 
         <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
             @if (session('success'))
-                <div class="mb-5 flex items-start gap-2.5 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-sm">
+                <div class="mb-5 flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-sm">
                     <svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     {{ session('success') }}
                 </div>
             @endif
             @if (session('error'))
-                <div class="mb-5 flex items-start gap-2.5 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 shadow-sm">
-                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                <div class="mb-5 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 shadow-sm">
+                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
                     {{ session('error') }}
                 </div>
             @endif

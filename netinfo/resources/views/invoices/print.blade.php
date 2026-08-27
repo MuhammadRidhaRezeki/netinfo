@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Faktur {{ $invoice->invoice_code }} · NetInfo</title>
+<link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 <style>
-    @@page { size: A4; margin: 12mm; }
+    @page { size: A4; margin: 12mm; }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+        font-family: "Inter", "Segoe UI", Tahoma, Arial, sans-serif;
         background: #e2e8f0;
         color: #0f172a;
         font-size: 13px;
@@ -24,16 +25,15 @@
         margin: 10mm auto;
         padding: 14mm 15mm;
         background: #ffffff;
-        box-shadow: 0 4px 24px rgba(15, 23, 42, .18);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         position: relative;
     }
 
-    /* ---------- Kop ---------- */
     .kop { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
     .brand { display: flex; gap: 12px; align-items: center; }
     .brand-mark {
-        width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
-        background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+        width: 46px; height: 46px; border-radius: 10px; flex-shrink: 0;
+        background: #0f172a;
         color: #fff; font-size: 19px; font-weight: 800;
         display: flex; align-items: center; justify-content: center; letter-spacing: -.5px;
     }
@@ -44,16 +44,14 @@
     .doc-id { text-align: right; }
     .doc-label {
         display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 2.5px;
-        color: #4f46e5; text-transform: uppercase;
-        border-bottom: 2px solid #4f46e5; padding-bottom: 3px;
+        color: #0f172a; text-transform: uppercase;
+        border-bottom: 2px solid #0f172a; padding-bottom: 3px;
     }
     .doc-number { font-family: Consolas, monospace; font-size: 15px; font-weight: 700; margin-top: 8px; letter-spacing: .5px; }
     .doc-date { font-size: 11px; color: #64748b; margin-top: 4px; }
 
-    .kop-rule { height: 4px; margin-top: 14px; border-radius: 2px;
-        background: linear-gradient(90deg, #4f46e5 0%, #0ea5e9 55%, #e2e8f0 100%); }
+    .kop-rule { height: 4px; margin-top: 14px; border-radius: 2px; background: #0f172a; }
 
-    /* ---------- Cap status ---------- */
     .stamp {
         position: absolute; top: 118px; right: 15mm;
         transform: rotate(-6deg);
@@ -67,7 +65,6 @@
     .stamp-unpaid { color: #b91c1c; background: rgba(239, 68, 68, .06); }
     .stamp-cancel { color: #475569; background: rgba(100, 116, 139, .08); }
 
-    /* ---------- Info pelanggan & faktur ---------- */
     .meta-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 22px; margin-top: 26px; }
     .section-title {
         font-size: 10px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase;
@@ -76,14 +73,13 @@
     .cust-name { font-size: 15px; font-weight: 800; }
     .cust-code {
         display: inline-block; font-family: Consolas, monospace; font-size: 11px; font-weight: 700;
-        color: #4338ca; background: #eef2ff; border-radius: 5px; padding: 2px 8px; margin-left: 6px;
+        color: #334155; background: #f1f5f9; border-radius: 5px; padding: 2px 8px; margin-left: 6px;
     }
     .kv { display: grid; grid-template-columns: 108px 1fr; row-gap: 3px; font-size: 12px; }
     .kv dt { color: #64748b; }
     .kv dd { font-weight: 600; }
     .overdue-flag { color: #b91c1c !important; font-weight: 800 !important; }
 
-    /* ---------- Strip ODP ---------- */
     .odp-strip {
         margin-top: 16px; padding: 8px 12px; border-radius: 8px;
         background: #f0f9ff; border: 1px solid #bae6fd;
@@ -91,10 +87,9 @@
     }
     .odp-strip b { color: #075985; }
 
-    /* ---------- Tabel layanan ---------- */
     table.items { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 12px; }
     table.items th {
-        background: #f1f5f9; color: #475569; text-align: left;
+        background: #f8fafc; color: #475569; text-align: left;
         font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase;
         padding: 8px 10px; border-bottom: 2px solid #cbd5e1;
     }
@@ -109,11 +104,10 @@
     .grand {
         display: flex; justify-content: space-between; align-items: center;
         margin-top: 4px; padding: 10px 12px; border-radius: 8px;
-        background: #eef2ff; border: 1px solid #c7d2fe;
-        font-size: 14px; font-weight: 900; color: #3730a3;
+        background: #f1f5f9; border: 1px solid #cbd5e1;
+        font-size: 14px; font-weight: 900; color: #0f172a;
     }
 
-    /* ---------- Footer ---------- */
     .pay-note {
         margin-top: 26px; border-radius: 8px; padding: 11px 14px;
         background: #f8fafc; border: 1px solid #e2e8f0;
@@ -130,7 +124,6 @@
         display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;
     }
 
-    /* ---------- Tombol melayang ---------- */
     .fab {
         position: fixed; right: 22px; bottom: 22px; z-index: 50;
         display: flex; gap: 10px;
@@ -138,14 +131,14 @@
     .fab button {
         cursor: pointer; border: 0; border-radius: 999px; padding: 12px 22px;
         font-size: 13px; font-weight: 800; color: #fff;
-        box-shadow: 0 8px 22px rgba(15, 23, 42, .28);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         transition: transform .15s ease, filter .15s ease;
     }
     .fab button:hover { transform: translateY(-2px); filter: brightness(1.08); }
-    .fab .btn-print { background: #059669; }
+    .fab .btn-print { background: #0f172a; }
     .fab .btn-back { background: #475569; }
 
-    @@media print {
+    @media print {
         body { background: #ffffff; }
         .sheet { width: auto; margin: 0; padding: 0; box-shadow: none; }
         .stamp { top: 96px; }
@@ -166,10 +159,31 @@
         $rp = fn ($v) => 'Rp ' . number_format((float) $v, 0, ',', '.');
     @endphp
 
-    {{-- ======== KOP ======== --}}
     <div class="kop">
         <div class="brand">
-            <div class="brand-mark">NI</div>
+            <div class="brand-mark">
+                <svg viewBox="0 0 48 48" fill="none" style="width: 28px; height: 28px;" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="invNetGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00f0ff" />
+                            <stop offset="35%" stop-color="#38bdf8" />
+                            <stop offset="70%" stop-color="#a855f7" />
+                            <stop offset="100%" stop-color="#ec4899" />
+                        </linearGradient>
+                        <linearGradient id="invPulseGrad4" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#00f0ff" />
+                            <stop offset="50%" stop-color="#ffffff" />
+                            <stop offset="100%" stop-color="#ec4899" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M12 36V14C12 9.5 16 8.5 19 11.5L25.5 19" stroke="url(#invNetGrad4)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M22.5 29L29 36.5C32 39.5 36 38.5 36 34V12" stroke="url(#invNetGrad4)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M15 24H19.5L21.5 18L24.5 30L26.5 24H33" stroke="url(#invPulseGrad4)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+                    <circle cx="12" cy="36" r="1.8" fill="#00f0ff" />
+                    <circle cx="36" cy="12" r="1.8" fill="#ec4899" />
+                    <circle cx="23" cy="24" r="1.4" fill="#ffffff" />
+                </svg>
+            </div>
             <div>
                 <p class="brand-name">NetInfo</p>
                 <p class="brand-sub">Network &amp; Internet Management Solution</p>
@@ -187,13 +201,11 @@
     </div>
     <div class="kop-rule"></div>
 
-    {{-- ======== CAP STATUS ======== --}}
     <div class="stamp {{ $statusMeta['class'] }}">
         {{ $statusMeta['label'] }}
         <small>{{ $statusMeta['sub'] }}</small>
     </div>
 
-    {{-- ======== DATA PELANGGAN & METADATA ======== --}}
     <div class="meta-grid">
         <div>
             <p class="section-title">Ditagihkan Kepada</p>
@@ -219,7 +231,6 @@
         </div>
     </div>
 
-    {{-- ======== NODE ODP TERHUBUNG ======== --}}
     @if ($invoice->customer->node)
         <div class="odp-strip">
             Titik distribusi jaringan: <b>{{ $invoice->customer->node->name }}</b>
@@ -230,7 +241,6 @@
         </div>
     @endif
 
-    {{-- ======== RINCIAN LAYANAN ======== --}}
     <table class="items">
         <thead>
             <tr>
@@ -262,8 +272,6 @@
     </table>
 
     @php
-        // Biaya tambahan (PPN / admin) tidak dipungut saat ini;
-        // jika suatu ada, cukup isi variabel berikut agar barisnya tampil otomatis.
         $ppnFee = null;
     @endphp
 
@@ -277,7 +285,6 @@
         </div>
     </div>
 
-    {{-- ======== FOOTER BUKTI BAYAR ======== --}}
     <div class="pay-note">
         @if ($invoice->payment_status === 'paid')
             <b>Keterangan Pembayaran:</b> Diterima penuh via <b>{{ $invoice->payment_method ?: 'Transfer Bank SeaBank / QRIS' }}</b>.
@@ -309,7 +316,6 @@
     </div>
 </div>
 
-{{-- ======== NAVIGASI MELAYANG ======== --}}
 <div class="fab no-print">
     <button type="button" class="btn-back" onclick="window.history.length > 1 ? window.history.back() : window.location.assign('/')">&larr; Kembali</button>
     <button type="button" class="btn-print" onclick="window.print()">&#128424; Cetak / Print PDF</button>

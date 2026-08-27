@@ -2,7 +2,7 @@
 
 **Nama Produk:** NetInfo (Network Information & Operation Management System)  
 **Topik:** Rancang Bangun Sistem Informasi Manajemen Operasional Jaringan, Layanan Gangguan (*Trouble Ticketing*), dan *Billing* Pelanggan Berbasis Web Menggunakan Framework Laravel  
-**Versi Dokumen:** 1.0 (Final Architecture Blueprint)  
+**Versi Dokumen:** 1.1 (Updated Architecture Blueprint)  
 **Target Platform:** Web Desktop & Mobile-Responsive  
 
 ---
@@ -13,7 +13,7 @@
 
 1. **Trouble Ticketing Lifecycle (Helpcare):** Manajemen siklus hidup komplain gangguan jaringan dari pelaporan mandiri pelanggan, disposisi teknisi lapangan oleh Admin NOC, pencatatan log teknis perbaikan, hingga penyelesaian kendala dengan jejak audit (*audit trail*) otomatis.
 2. **Automated Billing Management & Invoicing:** Pembangkitan invoice tagihan bulanan secara massal, integrasi gerbang pembayaran multi-metode (Transfer Bank SeaBank & QRIS Dinamis), portal unggah bukti bayar pelanggan, verifikasi admin (*Approve/Reject*), serta pencetakan faktur resmi individual standar A4 siap cetak (`@media print`).
-3. **Network Node Infrastructure Mapping:** Pemetaan keterhubungan pelanggan ke titik distribusi jaringan (*Optical Distribution Point* / ODP), pemantauan status operasional node (*active, maintenance, down*), dan mekanisme otomatis *cascade isolation & restoration* bagi pelanggan terhubung.
+3. **Network Node Infrastructure Mapping:** Pemetaan keterhubungan pelanggan ke titik distribusi jaringan (*Optical Distribution Point* / ODP), lokasi, IP manajemen, pemantauan status operasional node (*active, maintenance, down*), dan mekanisme otomatis *cascade isolation & restoration* bagi pelanggan terhubung.
 
 ---
 
@@ -72,6 +72,7 @@ NetInfo dibangun menggunakan arsitektur **Monolithic Model-View-Controller (MVC)
   * **Status Peringatan (Maintenance / Pending / Medium):** Amber / Yellow (`bg-amber-500`, `text-amber-700`).
   * **Status Bahaya (Down / Isolated / Unpaid / High):** Rose / Red (`bg-rose-500`, `text-rose-700`).
 * **Invoice Print Engine (`invoices.print`):** Tampilan faktur resmi siap cetak format A4 (`@media print`) yang menyertakan kop NetInfo, nomor dokumen unik, stempel status (LUNAS/BELUM LUNAS), rincian ODP, detail tagihan, dan bagian tanda tangan pengesahan.
+* **Modal Pembayaran Interaktif (`customer.dashboard`):** Pop-up opsi pembayaran dengan SeaBank Transfer & QRIS Dinamis + fitur unggah bukti transfer.
 * **Flash Feedback & Toast Alerts:** Notifikasi visual instan (*success/error*) pada setiap mutasi data untuk menjamin kejelasan interaksi pengguna.
 
 ### 3.2. Lapisan Keamanan & Routing (Security & Routing Layer)
@@ -93,8 +94,8 @@ NetInfo dibangun menggunakan arsitektur **Monolithic Model-View-Controller (MVC)
 | **`TechnicianController`** | Menyajikan dashboard kerja teknisi, antrean tiket tugas prioritas tinggi, dan katalog data pelanggan (*read-only*). |
 | **`CustomerController`** | Dashboard mandiri pelanggan (info paket, ringkasan tagihan), portal *Helpcare* pembuatan tiket gangguan, unggah bukti transfer pembayaran, dan unduh berkas bukti transfer. |
 | **`TicketController`** | Manajemen antrean tiket admin & teknisi, disposisi penugasan teknisi (*Assign*), mesin transisi status tiket, penambahan log teknis perbaikan (*audit history*), dan ekspor rekapitulasi CSV. |
-| **`InvoiceController`** | Pembangkitan massal invoice bulanan (`generateMonthly`), rekap data billing, verifikasi bukti pembayaran (*Approve/Reject*), ekspor laporan keuangan CSV, dan render halaman cetak faktur A4. |
-| **`NetworkNodeController`** | CRUD titik distribusi ODP, pemantauan kapasitas & port terpakai, serta eksekusi *cascade isolation/restoration* pelanggan saat status node berubah. |
+| **`InvoiceController`** | Pembangkitan massal invoice bulanan (`generateMonthly`), rekap data billing, verifikasi bukti pembayaran (*Approve/Reject*), ekspor laporan keuangan & tiket CSV, dan render halaman cetak faktur A4. |
+| **`NetworkNodeController`** | Kelola titik distribusi ODP (Admin: CRUD; Teknisi: tambah dan ubah), filter status, serta eksekusi *cascade isolation/restoration* pelanggan saat status node berubah. |
 | **`SearchController`** | Fitur pencarian global lintas entitas (Tiket, Pelanggan, Invoice) dengan filter otomatis sesuai role pengguna. |
 
 ### 3.4. Lapisan Layanan & Pendukung (Support & Domain Services Layer)
@@ -123,7 +124,7 @@ Sistem NetInfo membagi pengguna ke dalam 3 peran (*roles*) dengan batasan hak ak
 |---|:---:|:---:|:---:|
 | **Dashboard Metrik & Ringkasan** | Full NOC Dashboard (Revenue, Chart, ODP, Tiket) | Work Order Dashboard (Tugas Saya, Node Aktif) | Portal Mandiri (Paket Aktif, Tagihan, Tiket) |
 | **Master Paket Layanan** | Full CRUD | No Access (Hidden) | View Active Packages (Landing/Register) |
-| **Master Network Nodes (ODP)** | Full CRUD | Full CRUD (Kelola Lapangan) | No Access (Hidden) |
+| **Master Network Nodes (ODP)** | Full CRUD | Tambah & Ubah (Kelola Lapangan) | No Access (Hidden) |
 | **Data Pelanggan** | Full CRUD + Aksi Isolir/Pulihkan | Read-Only (Nama, ODP, Kontak) | Read-Only (Profil Sendiri) |
 | **Helpcare (Lapor Gangguan)** | Antrean Masuk & Disposisi | No Direct Report | Buat Tiket Baru (Create Ticket) |
 | **Disposisi Tiket (Assign)** | Tugaskan Teknisi | No Access | No Access |
@@ -134,6 +135,7 @@ Sistem NetInfo membagi pengguna ke dalam 3 peran (*roles*) dengan batasan hak ak
 | **Pembayaran Tagihan** | Manual Record / Verify | **BLOKIR TOTAL (403)** | Pilih Metode (SeaBank/QRIS) & Unggah Bukti |
 | **Cetak Faktur Resmi A4** | Cetak Seluruh Faktur | **BLOKIR TOTAL (403)** | Cetak Faktur Akun Sendiri |
 | **Ekspor Data (CSV)** | Ekspor Tiket & Invoice | No Access | No Access |
+| **Modal Pembayaran** | No Access | **BLOKIR TOTAL (403)** | SeaBank Transfer & QRIS + Upload Bukti |
 | **Pencarian Global** | Tiket, Pelanggan, Invoice | Tiket Ditugaskan & Pelanggan | Tiket & Invoice Sendiri |
 
 ---

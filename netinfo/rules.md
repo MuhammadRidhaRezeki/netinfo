@@ -2,7 +2,7 @@
 
 **Nama Produk:** NetInfo (Network Information & Operation Management System)  
 **Tujuan Dokumen:** Menetapkan seluruh aturan bisnis domain (*Business Rules*), batasan otorisasi (*Authorization Rules*), siklus hidup entitas (*Lifecycle State Machines*), dan standar rekayasa perangkat lunak (*Code Conventions*) untuk pengembangan sistem NetInfo.  
-**Versi Dokumen:** 1.0 (Final System Rules Blueprint)  
+**Versi Dokumen:** 1.1 (Updated System Rules Blueprint)  
 
 ---
 
@@ -19,6 +19,9 @@
 * **`BR-AUTH-04 (Customer Self-Service Isolation):`** Pelanggan hanya dapat melihat data profilnya sendiri, riwayat tiket gangguannya sendiri, dan tagihan/invoice atas nama dirinya sendiri (*IDOR Prevention*).
 * **`BR-AUTH-05 (Self-Registration Initial State):`** Pendaftaran mandiri via `/register` otomatis membuat akun `users` bertipe `customer` dan data `customers` dengan status awal `inactive` hingga dilakukan verifikasi dan jadwal instalasi oleh Admin.
 * **`BR-AUTH-06 (Admin-Created Customer):`** Ketika Administrator menambahkan pelanggan baru melalui panel admin, sistem wajib secara otomatis membuat akun login `users` baru (dengan kata sandi default atau yang ditentukan) dalam satu transaksi atomik database.
+* **`BR-AUTH-07 (Phone Number Validation):`** Nomor WhatsApp/telepon wajib diisi dengan karakter numerik saja (regex `[0-9]+`), minimal 10 digit, maksimal 15 digit. Berlaku di seluruh form yang menerima input nomor telepon (registrasi, CRUD pelanggan).
+* **`BR-AUTH-08 (Password Visibility Toggle):`** Halaman login dan form perubahan kata sandi wajib menyediakan fitur toggle show/hide password untuk meningkatkan usability pengguna.
+* **`BR-AUTH-09 (Customer Label Consistency):`** Di seluruh UI customer dashboard, label peran ditampilkan sebagai "User" bukan "Customer" untuk konsistensi branding produk.
 
 ---
 
@@ -47,7 +50,7 @@
   2. Sistem memulihkan status mereka menjadi `active` dan mengosongkan kembali kolom `isolated_by_node_id = NULL`.
   3. Pelanggan yang diisolir manual oleh Admin (karena tunggakan) **TIDAK AKAN** ikut terpulihkan secara tidak sengaja.
 * **`BR-NODE-04 (Aturan Penghapusan ODP / Deletion Guard):`** Titik ODP tidak dapat dihapus jika masih terdapat pelanggan yang terdaftar pada titik tersebut.
-* **`BR-NODE-05 (Hak Akses ODP):`** Administrator dan Teknisi Lapangan sama-sama memiliki izin penuh (*Full CRUD*) untuk mengelola titik ODP guna kebutuhan penyesuaian operasional lapangan.
+* **`BR-NODE-05 (Hak Akses ODP):`** Administrator memiliki izin penuh (*Full CRUD*) untuk titik ODP. Teknisi dapat menambah dan memperbarui data ODP guna kebutuhan lapangan, tetapi penghapusan hanya diizinkan untuk Administrator.
 
 ---
 
@@ -72,11 +75,12 @@
 * **`BR-BIL-04 (Metode Pembayaran Resmi):`** Pelanggan dapat memilih salah satu dari 2 metode resmi:
   1. **Transfer Bank:** Rekening SeaBank `9981237810913` a.n. **Muhammad Ridha Rezeki**.
   2. **QRIS Dinamis:** Memindai QRIS resmi NetInfo dari aset sistem (`public/images/qris.jpg`).
-* **`BR-BIL-05 (Unggah Bukti Bayar):`** Pelanggan mengunggah berkas bukti transfer dengan validasi format (`jpg, jpeg, png, pdf`) dan ukuran maksimal 2 MB.
+* **`BR-BIL-05 (Unggah Bukti Bayar):`** Pelanggan mengunggah berkas bukti transfer dengan validasi format (`jpg, jpeg, png, pdf`) dan ukuran maksimal 2 MB. Pelanggan wajib memilih metode pembayaran (`SeaBank Transfer` atau `QRIS`) yang disimpan ke kolom `payment_method`.
 * **`BR-BIL-06 (Verifikasi Admin):`**
   * **Approve:** Mengubah status invoice menjadi `paid` dan mencatat waktu `payment_date = now()`.
   * **Reject:** Menghapus referensi berkas `payment_proof` dan `payment_method` dari database sehingga pelanggan dapat melakukan unggah ulang bukti yang valid.
 * **`BR-BIL-07 (Cetak Faktur Resmi A4):`** Faktur cetak individual (`GET /invoices/{id}/print`) harus berstandar format cetak A4 (`@media print`) yang memuat rincian identitas NetInfo, kode invoice, nama & alamat pelanggan, titik ODP terhubung, detail paket, rincian biaya, serta cap stempel resmi (**LUNAS** atau **BELUM LUNAS**).
+* **`BR-BIL-08 (Ekspor Rekapitulasi CSV):`** Administrator dapat mengekspor rekapitulasi billing dan tiket gangguan ke file CSV dengan filter periode bulan dan status. File CSV menggunakan encoding UTF-8 BOM untuk kompatibilitas dengan spreadsheet Indonesia.
 
 ---
 
